@@ -34,13 +34,16 @@ function saveState(key, value) {
 
 // ─── AI ───────────────────────────────────────────────────────────────────────
 async function callAI(messages, system) {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
+  const res = await fetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1024, system, messages }),
+    body: JSON.stringify({ messages, system }),
   });
+
   const d = await res.json();
-  return d.content?.[0]?.text || "I couldn't respond — try again.";
+
+  // Gemini returns { text: "..." } from our proxy
+  return d.text || "I couldn't respond — try again.";
 }
 
 function makeSystem(items, user) {
